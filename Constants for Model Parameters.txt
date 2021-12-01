@@ -1,0 +1,7 @@
+m1 = 7.348e+22   % Mass of the Moon (kg)
+
+m2 = 5.972e+24   % Mass of the Earth (kg)
+
+r = 3.844e+8         % Distance between the Earth and the Moon (m)
+
+G = 6.674×10−11  % Gravitational Constant (m3⋅kg−1⋅s−2)
