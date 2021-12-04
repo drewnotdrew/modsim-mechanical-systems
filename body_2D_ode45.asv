@@ -30,16 +30,16 @@ t_span = [t_0, t_end];
 options = odeset('Events',@event_func, 'RelTol', 1e-5);
 
 % Run ode45
-[T, M] = ode15s(@rate_func, t_span, bodyParameters, options);
+[T, M] = ode45(@rate_func, t_span, bodyParameters, options);
     function res = rate_func(~,M)
         bodyPosition = M(1:2);
 %         bodyMoonPosition = M(3:4);
         bodyVelocity = M(3:4);
-        bodyMoonPosition = bodyPosition - [-d; rEarth];
+        bodyMoonPosition = bodyPosition - [-d, rEarth];
         dPdt = [bodyVelocity]; % [bodyMoonPosition]
         dVdt = acceleration(bodyPosition, bodyMoonPosition, bodyVelocity);
-       L  = size(dPdt);
-       L2 = size(dVdt);
+       L  = size(dPdt)
+       L2 = size(dVdt)
         res = [dPdt; dVdt];
     end
     
@@ -47,9 +47,9 @@ options = odeset('Events',@event_func, 'RelTol', 1e-5);
         gravForceEarth = -(G*earthMass*bodyMass)/(norm(bodyPosition)^2) * (bodyPosition/norm(bodyPosition));
         gravForceMoon = -(G*moonMass*bodyMass)/(norm(bodyMoonPosition)^2) * (bodyMoonPosition/norm(bodyMoonPosition));
         dAdt = gravForceEarth/bodyMass + gravForceMoon/bodyMass;
-        moonbrr = size(gravForceMoon);
-        earthbrr = size(gravForceEarth);
-        jerkbrr = size(dAdt);
+        size(gravForceMoon)
+        size()
+        size(dAdt)
         res = [dAdt];
 
     end
