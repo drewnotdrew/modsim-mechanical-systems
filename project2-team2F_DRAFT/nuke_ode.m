@@ -4,8 +4,7 @@ function [T, M] = nuke_ode(nukeVelocity)
 G = 6.67e-11;        % Gravitational Constant ((N*m^2)/kg^2)
 earthMass = 5.97e24; % Mass of the earth(kg)
 sunMass = 1.99e30;   % Mass of the sun(kg)
-nukeMass = 60;       % Mass of the nuke (kg)
-d = 3.844e8;         % Distance between the Earth and the Moon (m)
+nukeMass = 1000;     % Mass of the nuke (kg)
 rEarth = 6.371e6;    % Radius of the Earth
 
 % Initial parameters 
@@ -13,7 +12,7 @@ earthX = 0;                  % X-position of the Earth
 earthY = 0;                  % Y-position of the Earth
 earthPos = [earthX, earthY]; % Matrix of the Earth's position 
 nukeX = 0;
-nukeY = rEarth; % What is rEarth?
+nukeY = rEarth;              % The nuke is 1 Earth radii from the center of the Earth
 nukePos = [nukeX, nukeY];
 nukeParameters = [nukePos, nukeVelocity];
 
@@ -31,12 +30,12 @@ options = odeset('Events',@event_func, 'RelTol', 1e-5); % Ask drew about the eve
         nukeVelocity = M(3:4);
         
         dPdt = [nukeVelocity];
-        dVdt = acceleration(nukePosition, nukeVelocity);
+        dVdt = acceleration(nukePosition);
 
         res = [dPdt; dVdt];
     end
     
-    function res = acceleration(nukePosition, nukeVelocity)
+    function res = acceleration(nukePosition)
         gravForceEarth = -(G*earthMass*nukeMass)/(norm(nukePosition)^2) * (nukePosition/norm(nukePosition));
 
         dAdt = gravForceEarth/nukeMass; 
@@ -45,6 +44,7 @@ options = odeset('Events',@event_func, 'RelTol', 1e-5); % Ask drew about the eve
 
     end
 end
+
     function [value, isterminal, direction] = event_func(~, M) % This is the helper function
     value = 0;
     isterminal = 1;
