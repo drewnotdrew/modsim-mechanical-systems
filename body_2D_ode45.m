@@ -1,4 +1,9 @@
-function [T, M] = body_2D_ode45(bodyVelocity);
+function [T, M] = body_2D_ode45(launchAngle, launchVelocity);
+
+% Calculate x and y velocities from launch angle and launch velocity.
+launchXvelocity = sind(90-launchAngle)*launchVelocity;
+launchYvelocity = cosd(90-launchAngle)*launchVelocity;
+bodyVelocity = [launchXvelocity,launchYvelocity]; % (m/s)
 
 % Model parameters
 G = 6.67e-11; % Gravitational Constant ((N*m^2)/kg^2)
@@ -25,12 +30,12 @@ bodyParameters = [bodyPos, bodyVelocity]; % bodyMoonPos may be needed (?)
 % Simulation parameters
 
 t_0 = 0;
-t_end = 60*60*24*365;
+t_end = 60*60*24*7;
 t_span = [t_0, t_end];
 options = odeset('Events',@event_func, 'RelTol', 1e-5);
 
 % Run ode45
-[T, M] = ode15s(@rate_func, t_span, bodyParameters, options);
+[T, M] = ode45(@rate_func, t_span, bodyParameters, options);
     function res = rate_func(~,M)
         bodyPosition = M(1:2);
 %         bodyMoonPosition = M(3:4);
@@ -54,8 +59,11 @@ options = odeset('Events',@event_func, 'RelTol', 1e-5);
 
     end
 end
-    function [value, isterminal, direction] = event_func(~, M)
-    value = 0;
-    isterminal = 1;
-    direction = -1;
+    function [value, isterminal, direction] = event_func(T, M)
+        P = M(1:2); %Position of body
+        P_1 = M(1:2)-[3.844e8; 0]; % Tried to use moonX and moonY. How do we use these in the event function?
+        dist = norm(P_1) - 1.738e6 - 75000*1000;
+        value = sign(dist) + 1;
+        isterminal = 1;
+        direction = -1;
     end
