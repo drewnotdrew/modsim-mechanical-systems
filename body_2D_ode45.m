@@ -1,4 +1,4 @@
-function [T, M] = body_2D_ode45(launchAngle, launchVelocity);
+function [T, M] = body_2D_ode45(launchAngle, launchVelocity)
 
 % Calculate x and y velocities from launch angle and launch velocity.
 launchXvelocity = sind(90-launchAngle)*launchVelocity;
@@ -15,13 +15,13 @@ rEarth = 6.371e6; % Radius of Earth
 
 % Initial parameters 
 bodyX = 0;
-bodyY = rEarth; 
+bodyY = rEarth;
 bodyPos = [bodyX, bodyY];
-bodyParameters = [bodyPos, bodyVelocity]; % bodyMoonPos may be needed (?)
+bodyParameters = [bodyPos, bodyVelocity];
 
 % Simulation parameters
 t_0 = 0;
-t_end = 60*60*24*7;
+t_end = 60*60*24*7; % A week of time in seconds
 t_span = [t_0, t_end];
 options = odeset('Events',@event_func, 'RelTol', 1e-5);
 
@@ -32,21 +32,20 @@ options = odeset('Events',@event_func, 'RelTol', 1e-5);
         bodyVelocity = M(3:4);
         bodyMoonPosition = bodyPosition - [-d; rEarth];
         dPdt = [bodyVelocity];
-        dVdt = acceleration(bodyPosition, bodyMoonPosition, bodyVelocity);
+        dVdt = acceleration(bodyPosition, bodyMoonPosition);
         res = [dPdt; dVdt];
     end
     
-    function res = acceleration(bodyPosition, bodyMoonPosition, bodyVelocity)
+    function res = acceleration(bodyPosition, bodyMoonPosition)
         gravForceEarth = -(G*earthMass*bodyMass)/(norm(bodyPosition)^2) * (bodyPosition/norm(bodyPosition));
         gravForceMoon = -(G*moonMass*bodyMass)/(norm(bodyMoonPosition)^2) * (bodyMoonPosition/norm(bodyMoonPosition));
-        dAdt = gravForceEarth/bodyMass + gravForceMoon/bodyMass;
-        res = [dAdt];
-
+        A = gravForceEarth/bodyMass + gravForceMoon/bodyMass;
+        res = [A];
     end
 end
     % Helper function
-    function [value, isterminal, direction] = event_func(T, M)
-        P = M(1:2); % Position of body
+    function [value, isterminal, direction] = event_func(~, M)
+%         P = M(1:2); % Position of body
         P_1 = M(1:2)-[3.844e8; 0]; % Tried to use moonX and moonY. How do we use these in the event function?
         dist = norm(P_1) - 1.738e6 - 75000*1000;
         value = sign(dist) + 1;
